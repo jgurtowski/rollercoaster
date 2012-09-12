@@ -4,10 +4,11 @@
 namespace rollercoaster{
 
   /**
-   *Packed DNA sequence
+   *Pack Sequence of bits
    */
   class PackedSequence{
 
+  public:
     typedef unsigned char PackedByte;
     
     /**
@@ -26,7 +27,14 @@ namespace rollercoaster{
      * the bits 011 will be pushed onto the left of the bit array
      */
     void push_bits(PackedByte byte, int num_bits);
-    
+  
+
+    /**
+     *Pops bits from the underlying bit array
+     *Bits are popped from the left most bit in the left most byte (array style)
+     */
+    PackedByte pop_bits(int num_bits);
+  
     /**
      *Return the number of bits handeled by this sequence
      */
@@ -43,15 +51,15 @@ namespace rollercoaster{
     const PackedByte *packed_bytes() const;
         
 
-    ~PackedSequence();
+    virtual ~PackedSequence();
 
   private:
     int num_bits_;
-    int num_extra_bits;
+    int num_extra_bits_;
     int num_packed_bytes_;
     PackedByte extra_bit_mask_;
     PackedByte *packed_bytes_;
-  };
+  }; //class PackedSequence
 
-}
+}//namespace rollercoaster
 #endif
