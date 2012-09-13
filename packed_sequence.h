@@ -15,6 +15,7 @@ namespace rollercoaster{
      *How many bits will be handeled by the sequence
      */
     PackedSequence(int required_bits);
+
     
     /**
      *Clears the internal pack buffer
@@ -34,7 +35,17 @@ namespace rollercoaster{
      *Bits are popped from the left most bit in the left most byte (array style)
      */
     PackedByte pop_bits(int num_bits);
-  
+    
+    /**
+     *Retrieves the bits at position index without modifying
+     *the underlying bit array.
+     *The bits will be moved to the least significant position
+     *on the returned PackedByte
+     * Warning: Doesn't work for odd number num_bits (must
+     *divide evenly into 8
+     */
+    PackedByte bits_at(int index,int num_bits);
+
     /**
      *Return the number of bits handeled by this sequence
      */
@@ -49,16 +60,24 @@ namespace rollercoaster{
      *Return pointer to unmodifiable view of the packed byte sequence
      */
     const PackedByte *packed_bytes() const;
-        
 
     virtual ~PackedSequence();
 
+  protected:
+    /**
+     *Copy constructor
+     */
+    PackedSequence(const PackedSequence &other);
+
   private:
     int num_bits_;
-    int num_extra_bits_;
+    int num_padding_bits_;
     int num_packed_bytes_;
-    PackedByte extra_bit_mask_;
     PackedByte *packed_bytes_;
+    
+    //disallow reassignment
+    const PackedSequence &operator=(const PackedSequence &);
+
   }; //class PackedSequence
 
 }//namespace rollercoaster

@@ -1,5 +1,5 @@
 #include <assert.h>
-
+#include <iostream>
 #include <string>
 
 #include "packed_kmer.h"
@@ -18,6 +18,11 @@ namespace rollercoaster{
     0,2,0,0,0,0,0,0,3,0,
     0,0,0,0,4
   };
+  
+  const char PackedKmer::BitsToChar[] = {
+    'A','C','G','N','T'
+  };
+
 
   PackedKmer::PackedKmer(int kmer_size):PackedSequence(BitsPerBase * kmer_size),
                                         kmer_size_(kmer_size){
@@ -26,15 +31,29 @@ namespace rollercoaster{
 
   void PackedKmer::set_kmer(const std::string::const_iterator &begin,
                             const std::string::const_iterator &end){
-
-    for(std::string::const_iterator it = begin; it != end; ++it){
+    std::string::const_iterator it = end; 
+    std::string::const_iterator b = begin;
+    b--;it--;
+    for(;it != b; --it){
       push_bits(encode_base(*it),BitsPerBase);
     }
     
   }
-    
+      
   void PackedKmer::add_base(const char base){
     push_bits(encode_base(base),BitsPerBase);
+  }
+
+  void PackedKmer::str_kmer(std::string *kmer_out) const{
+    if(kmer_size_ != kmer_out->size())
+      kmer_out->resize(kmer_size_);
+
+    //make a copy of this object so we don't modify our internal
+    //bit array
+    PackedKmer copy(*this);
+    for(int i=0;i<kmer_size_;++i){
+      (*kmer_out)[i] = decode_base(copy.pop_bits(BitsPerBase));
+    }
   }
 
   PackedKmer::EncodedBase PackedKmer::encode_base(const char base){
@@ -42,5 +61,9 @@ namespace rollercoaster{
     return CharToBits[base];
   }
 
+  char PackedKmer::decode_base(const EncodedBase base){
+    assert(base >=0 && base <= 4);
+    return BitsToChar[base];
+  }
 
 }//namespace rollercoaster

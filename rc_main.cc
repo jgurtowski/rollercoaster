@@ -1,22 +1,19 @@
-#include <stdio.h>
-#include <vector>
 #include <iostream>
 #include <string>
 
-#include "memcache_klookup.h"
+#include "packed_kmer.h"
 
 int main(void){
   
-  std::vector<rollercoaster::MemcacheHost> server_vec;
-  server_vec.push_back(rollercoaster::MemcacheHost("slippery.cshl.edu",11211));
-  
-  rollercoaster::MemcacheKlookup kmer_lookup(server_vec);
+  std::string kmer = "ACGTACGTACGTACGT";
 
-  std::cout<<kmer_lookup.set_kmer("ACGTACGTAGCAGTA",13)<<std::endl;
-  std::cout<<kmer_lookup.set_kmer("ACGTACGTAGCAGTC",23)<<std::endl;
-  std::cout << "value:" << kmer_lookup.get_count("ACGTACGTAGCAGTA")<<std::endl;
-  std::cout << "value:" << kmer_lookup.get_count("ACGTACGTAGCAGTC")<<std::endl;
-  std::cout << "value:" << kmer_lookup.get_count("ACGTACGTAGCAGTG")<<std::endl;
-  
+  rollercoaster::PackedKmer p_kmer(kmer.size());
+  p_kmer.set_kmer(kmer.begin(), kmer.end());
+  std::cout << p_kmer.packed_bytes() << std::endl;
+
+  std::string output;
+  p_kmer.str_kmer(&output);
+  std::cout << output << std::endl;
+    
   return 0;
 }

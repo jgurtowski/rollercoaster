@@ -9,14 +9,14 @@
 
 namespace rollercoaster{
 
-
   class PackedKmer: public PackedSequence{
   public:  
     typedef unsigned char EncodedBase;
-
-    static const int BitsPerBase = 3;
     
+    static const int BitsPerBase = 3;
+
     static const EncodedBase CharToBits[];
+    static const char BitsToChar[];
     
     PackedKmer(int kmer_size);
 
@@ -34,14 +34,22 @@ namespace rollercoaster{
     void add_base(const char base);
 
     /**
-     *Encodes given base, encoded base will be BitsPerBase in size
+     *puts the string representation of the kmer into kmer_out
+     */
+    void str_kmer(std::string *kmer_out) const;
+
+    /**
+     *Encodes given base, encoded base will be BitsPerBase bits in size
      */
     static EncodedBase encode_base(const char base);
-
+    
+    /**
+     *Decodes an EncodedBase and returns the char representation
+     */
+    static char decode_base(const EncodedBase base);
 
   private:
     int kmer_size_;
-    
 
   };
 
