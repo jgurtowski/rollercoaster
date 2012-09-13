@@ -7,14 +7,14 @@
 namespace rollercoaster{
 
   PackedSequence::PackedSequence(int required_bits):num_bits_(required_bits),
-                                                    num_padding_bits_(8 - (num_bits_ % 8)),
+                                                    num_padding_bits_(num_bits_ % 8 > 0 ? (8 - (num_bits_ % 8)):0),
                                                     num_packed_bytes_(num_bits_ / 8 + (num_bits_ % 8 > 0 ? 1: 0)),
                                                     packed_bytes_(new PackedByte[num_packed_bytes_]){
     clear();
   }
   
   PackedSequence::PackedSequence(const PackedSequence &other):num_bits_(other.num_bits()),
-                                                              num_padding_bits_(8 -(num_bits_ %8)),
+                                                              num_padding_bits_(num_bits_ % 8 > 0 ? (8 - (num_bits_ % 8)):0),
                                                               num_packed_bytes_(other.num_bytes()),
                                                               packed_bytes_(new PackedByte[num_packed_bytes_]){
     memcpy(packed_bytes_, other.packed_bytes(), num_packed_bytes_);
