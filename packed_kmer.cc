@@ -25,7 +25,8 @@ namespace rollercoaster{
 
 
   PackedKmer::PackedKmer(int kmer_size):PackedSequence(BitsPerBase * kmer_size),
-                                        kmer_size_(kmer_size){
+                                        kmer_size_(kmer_size),
+                                        is_set_(false){
     
   }
 
@@ -38,10 +39,15 @@ namespace rollercoaster{
       push_bits(encode_base(*it),BitsPerBase);
     }
     
+    if(!is_set_)
+      is_set_ = true;
   }
       
   void PackedKmer::add_base(const char base){
     push_bits(encode_base(base),BitsPerBase);
+    
+    if(!is_set_)
+      is_set_ = true;
   }
 
   void PackedKmer::str_kmer(std::string *kmer_out) const{

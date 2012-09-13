@@ -38,6 +38,8 @@ namespace rollercoaster{
      */
     void str_kmer(std::string *kmer_out) const;
 
+    inline bool is_set() const {return is_set_;}
+
     /**
      *Encodes given base, encoded base will be BitsPerBase bits in size
      */
@@ -50,6 +52,7 @@ namespace rollercoaster{
 
   private:
     int kmer_size_;
+    bool is_set_;
 
   };
 
