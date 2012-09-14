@@ -47,7 +47,6 @@ namespace rollercoaster{
       const std::string &read_;
       int kmer_size_;
       int kmer_idx_;
-      bool base_waiting_;
 
       //this class should be subclassed
       //but not support polymorphism

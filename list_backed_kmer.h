@@ -28,13 +28,13 @@ namespace rollercoaster{
     inline bool is_set() const {return is_set_;}
 
     inline void add_base_left(char base){
-      list_kmer_.push_front(base);
       list_kmer_.pop_back();
+      list_kmer_.push_front(base);
     }
 
     inline void add_base_right(char base){
-      list_kmer_.push_back(base);
       list_kmer_.pop_front();
+      list_kmer_.push_back(base);
     }
 
     virtual std::string str_kmer(){ return const_cast<const ListBackedKmer *>(this)->str_kmer();}
