@@ -42,6 +42,7 @@ namespace rollercoaster{
     return output;
   }
 
+
   //doesn't handle byte boundaries well, only use num_bits that divide evenly into 8
   PackedSequence::PackedByte PackedSequence::bits_at(int index,int num_bits){
     assert(index * num_bits + num_bits <= num_bits_ );

@@ -75,7 +75,7 @@ namespace rollercoaster{
     int num_packed_bytes_;
     PackedByte *packed_bytes_;
     
-    //disallow reassignment
+    //disallow assignment
     const PackedSequence &operator=(const PackedSequence &);
 
   }; //class PackedSequence

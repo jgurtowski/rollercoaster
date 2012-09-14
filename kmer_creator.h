@@ -1,21 +1,113 @@
 #ifndef KMER_CREATOR_H
 #define KMER_CREATOR_H
 
-#include <iterator>
 #include <string>
+#include <list>
 
+#include "list_backed_kmer.h"
 #include "packed_kmer.h"
+
 
 
 namespace rollercoaster{
 
+  class AbstractKmer;
+
+  /**
+   *Class:KmerCreator
+   * Creates kmers from a given string.
+   * To actually get the kmers use one of the iterator implementations
+   */
 
   class KmerCreator{
   public:
-    KmerCreator(const std::string &read);
-    
-    //Set the next read to be kmerized
-    set_read(const std::string &read);
+
+
+    /**
+     *Class: base_iterator
+     * base class iterator text kmers
+     */
+    class base_iterator{
+
+    public:
+      base_iterator(const std::string &input_str, int kmer_size, int kmer_index);
+
+      virtual const base_iterator &operator++() = 0;
+      virtual const AbstractKmer &operator*() = 0;
+      virtual const AbstractKmer *operator->() = 0;
+      virtual bool operator==(const base_iterator &rhs);
+      virtual bool operator!=(const base_iterator &rhs);
+
+      inline const std::string &read() const{ return read_;}
+      inline int index() const { return kmer_idx_; }
+      inline int kmer_size() const {return kmer_size_;}
+
+
+    protected:
+      const std::string &read_;
+      int kmer_size_;
+      int kmer_idx_;
+      bool base_waiting_;
+
+      //this class should be subclassed
+      //but not support polymorphism
+      //no pointers to base class
+      //use derived class only
+      virtual ~base_iterator(){}
+
+    };//class base_iterator
+
+
+    /**
+     *Class: const_iterator
+     * Forward iterator that gives an unmodifiable kmer view of the string
+     */
+
+    class const_iterator: public base_iterator{
+
+    public:
+
+    const_iterator(const std::string &input_str, int kmer_size, int kmer_index):
+      base_iterator(input_str, kmer_size, kmer_index),kmer_(kmer_size_){}
+
+      const const_iterator &operator++();
+      const ListBackedKmer &operator*();
+      const ListBackedKmer *operator->();
+
+      void load_data();
+
+    private :
+      ListBackedKmer kmer_;
+      
+    };//class const_iterator
+
+
+
+    /**
+     *Class: const_reverse_iterator
+     * Forward iterator that gives an unmodifiable kmer view of the string
+     */
+
+    class const_reverse_iterator: public base_iterator{
+      
+    public:
+
+    const_reverse_iterator(const std::string &input_str, int kmer_size, int kmer_index):
+      base_iterator(input_str, kmer_size, kmer_index),kmer_(kmer_size_){}
+
+      const const_reverse_iterator &operator++();
+      const ListBackedKmer &operator*();
+      const ListBackedKmer *operator->();
+
+      void load_data();
+
+    private :
+      ListBackedKmer kmer_;
+      
+    };//class const_iterator
+
+
+
 
     /**
      *Class: const_packed_reverse_iterator
@@ -24,35 +116,75 @@ namespace rollercoaster{
      *operate on the kmers in reverse due to the inner workings of
      *how things are packed
      */
-    class const_packed_reverse_iterator : public std::iterator<std::reverse_iterator_tag,PackedKmer> {
+    class const_packed_reverse_iterator: public base_iterator{
     public:
-      
-      const_packed_reverse_iterator(const std::string &input_str, int kmer_size);
-      
-      void operator++();
-      const PackedKmer &operator*();
-      const PackedKmer *operator->();
-      bool operator==(const PackedKmer &rhs);
-      bool operator!=(const PackedKmer &rhs);
-      
-      inline int index(){ return kmer_idx_;}
-      
+
+    const_packed_reverse_iterator(const std::string &input_str, int kmer_size, int kmer_index):
+      base_iterator(input_str,kmer_size,kmer_index),packed_kmer_(kmer_size_){}
+
+      virtual const const_packed_reverse_iterator &operator++();
+      virtual const PackedKmer &operator*();
+      virtual const PackedKmer *operator->();
+
+
     private:
-      const std::string &read_;
-      int kmer_idx_;
-      int kmer_size_;
+
+      void load_data();
       PackedKmer packed_kmer_;
-    };
+    };//class const_packed_reverse_iterator
+
+
+
+    KmerCreator(const std::string &read, int kmer_size);
+
+    //Set the next read to be kmerized
+    void set_read(const std::string &read);
+
+
+    /**
+     *Get const_packed_reverse_iterator to the beginning
+     * (remember this is a reverse iterator)
+     */
+    const_packed_reverse_iterator packed_rbegin();
+
+
+    /**
+     *Get const_packed_reverse_iterator to the end
+     * (remember this is a reverse iterator)
+     */
+    const_packed_reverse_iterator packed_rend();
+
+
+    /**
+     *Get const_iterator to the beginning 
+     */
+    const_iterator begin();
+    
+    /**
+     *Get const_iterator to end
+     */
+    const_iterator end();
+
+    /**
+     *Get const_reverse_iterator to the beginning
+     */
+    const_reverse_iterator rbegin();
+
+    /**
+     *Get const_reverse_iterator to the end
+     */
+    const_reverse_iterator rend();
     
 
-    
   private:
-    const std::string &read_;
-    
+    std::string read_;
+    int kmer_size_;
+
     //disallow copying because we work from a reference to an outside string
     KmerCreator(const KmerCreator &);
     KmerCreator &operator=(const KmerCreator &);
-  };
+
+  };//class KmerCreator
 
 }//namespace rollercoaster
 

@@ -1,19 +1,24 @@
 #include <iostream>
 #include <string>
 
-#include "packed_kmer.h"
+#include "kmer_creator.h"
 
 int main(void){
   
-  std::string kmer = "ACGTACGTACGTACGT";
+  namespace rc = rollercoaster;
+  
+  std::string read = "ACGTACGTACGTACGT";
 
-  rollercoaster::PackedKmer p_kmer(kmer.size());
-  p_kmer.set_kmer(kmer.begin(), kmer.end());
-  std::cout << p_kmer.packed_bytes() << std::endl;
+  rc::KmerCreator kcreator(read, 5);
+  
+  
+  rc::KmerCreator::const_iterator fb = kcreator.begin(), fe = kcreator.end();
+  rc::KmerCreator::const_reverse_iterator rb = kcreator.rbegin(), re = kcreator.rend();
 
-  std::string output;
-  p_kmer.str_kmer(&output);
-  std::cout << output << std::endl;
-    
+  std::cout << "read: " << read << std::endl;
+  for(; fb != fe && rb != re; ++rb,++fb){
+    std::cout << fb->str_kmer() << ":" << rb->str_kmer() << std::endl;
+  }
+      
   return 0;
 }
