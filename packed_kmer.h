@@ -23,6 +23,12 @@ namespace rollercoaster{
     PackedKmer(int kmer_size);
 
     /**
+     *Read packed kmer from given stream
+     *@return number of bytes read from stream
+     */
+    int read_from_stream(char *stream);
+
+    /**
      *Sets kmer using the characters between the iterators
      *begin and end
      */
@@ -46,6 +52,7 @@ namespace rollercoaster{
      */
     std::string str_kmer() const;
 
+
     /**
      *Optimization function to avoid copying
      *puts the string representation of the kmer into kmer_out
@@ -64,6 +71,7 @@ namespace rollercoaster{
      */
     static char decode_base(const EncodedBase base);
 
+    
   private:
     int kmer_size_;
     bool is_set_;

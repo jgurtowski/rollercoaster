@@ -1,6 +1,9 @@
+#include <string.h>
+
 #include <assert.h>
 #include <iostream>
 #include <string>
+
 
 #include "packed_kmer.h"
 
@@ -36,16 +39,12 @@ namespace rollercoaster{
     for(;end != begin; --end){
       push_bits(encode_base(*end),BitsPerBase);
     }
-    
-    if(!is_set_)
-      is_set_ = true;
+    is_set_ = true;
   }
       
   void PackedKmer::add_base(const char base){
     push_bits(encode_base(base),BitsPerBase);
-    
-    if(!is_set_)
-      is_set_ = true;
+    is_set_ = true;
   }
 
   void PackedKmer::str_kmer(std::string *kmer_out) const{
@@ -77,6 +76,13 @@ namespace rollercoaster{
   char PackedKmer::decode_base(const EncodedBase base){
     assert(base >=0 && base <= 4);
     return BitsToChar[base];
+  }
+
+  int PackedKmer::read_from_stream(char *stream){
+    int bytes = PackedSequence::CalcBytesForBits(BitsPerBase * kmer_size_);
+    memcpy(packed_bytes_, stream, bytes);
+    is_set_ = true;
+    return bytes;
   }
 
 }//namespace rollercoaster

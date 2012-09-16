@@ -61,6 +61,19 @@ namespace rollercoaster{
      */
     const PackedByte *packed_bytes() const;
 
+    /**
+     *Static utility function for calculating the number of
+     * bytes you need to hold a certain number of bits
+     */
+    static inline int CalcBytesForBits(int bits){ return (8 / bits + (8 % bits > 0 ? 1 : 0));} 
+
+
+    /**
+     *Compare method for comparing two packed sequences
+     */
+    friend int compare(const PackedSequence &lhs, const PackedSequence &rhs);
+
+
     virtual ~PackedSequence();
 
   protected:
@@ -68,12 +81,14 @@ namespace rollercoaster{
      *Copy constructor
      */
     PackedSequence(const PackedSequence &other);
+    
+    PackedByte *packed_bytes_;
 
   private:
     int num_bits_;
     int num_padding_bits_;
     int num_packed_bytes_;
-    PackedByte *packed_bytes_;
+
     
     //disallow assignment
     const PackedSequence &operator=(const PackedSequence &);

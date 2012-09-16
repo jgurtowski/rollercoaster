@@ -8,7 +8,7 @@ namespace rollercoaster{
 
   PackedSequence::PackedSequence(int required_bits):num_bits_(required_bits),
                                                     num_padding_bits_(num_bits_ % 8 > 0 ? (8 - (num_bits_ % 8)):0),
-                                                    num_packed_bytes_(num_bits_ / 8 + (num_bits_ % 8 > 0 ? 1: 0)),
+                                                    num_packed_bytes_(PackedSequence::CalcBytesForBits(num_bits_)),
                                                     packed_bytes_(new PackedByte[num_packed_bytes_]){
     clear();
   }
@@ -71,4 +71,17 @@ namespace rollercoaster{
   PackedSequence::~PackedSequence(){
     delete []packed_bytes_;
   }
+
+
+  int compare(const PackedSequence &lhs, const PackedSequence &rhs){
+
+    for( int i=0;i<lhs.num_packed_bytes_;++i){
+      if(lhs.packed_bytes_[i] < rhs.packed_bytes_[i])
+        return -1;
+      else if(lhs.packed_bytes_[i] > rhs.packed_bytes_[i])
+        return 1;
+    }
+    return 0;
+  }
+
 }
