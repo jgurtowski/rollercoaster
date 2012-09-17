@@ -9,16 +9,21 @@
 
 namespace rollercoaster{
 
-  class MMapKmerLookup: public AbstractKmerLookup{
+  class MMapFile;
 
+  class MMapKmerLookup: public AbstractKmerLookup{
+    
 
   public:
     typedef uint64_t KmerIndex;
     
-    MMapKmerLookup(char *mmap_data, uint64_t filesize);
+    MMapKmerLookup(MMapFile &file);
 
-    virtual bool has_kmer(const PackedKmer &packed_kmer);
-    virtual const KmerRecord &last_kmer(){return kmer_record_;}
+    inline int kmer_size() const { return kmer_size_; }
+
+    virtual bool has_record(const PackedKmer &packed_kmer);
+    virtual const KmerRecord &last_record(){return kmer_record_;}
+    
 
   private:
     char *mmap_db_;
@@ -29,7 +34,7 @@ namespace rollercoaster{
     KmerRecord kmer_record_;
 
     inline void  read_record_at(KmerIndex index){
-      kmer_record_.read_from_stream(mmap_db_ + (index * record_size_) + header_size_);
+      kmer_record_.read_from_binary_stream(mmap_db_ + (index * record_size_) + header_size_);
     }
 
   };

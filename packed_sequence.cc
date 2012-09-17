@@ -1,22 +1,24 @@
 #include <assert.h>
 #include <string.h>
 
+
 #include "packed_sequence.h"
 
 
 namespace rollercoaster{
 
   PackedSequence::PackedSequence(int required_bits):num_bits_(required_bits),
-                                                    num_padding_bits_(num_bits_ % 8 > 0 ? (8 - (num_bits_ % 8)):0),
-                                                    num_packed_bytes_(PackedSequence::CalcBytesForBits(num_bits_)),
+                                                    num_padding_bits_(CalcPaddingBits(num_bits_)),
+                                                    num_packed_bytes_(CalcBytesForBits(num_bits_)),
                                                     packed_bytes_(new PackedByte[num_packed_bytes_]){
     clear();
   }
   
   PackedSequence::PackedSequence(const PackedSequence &other):num_bits_(other.num_bits()),
-                                                              num_padding_bits_(num_bits_ % 8 > 0 ? (8 - (num_bits_ % 8)):0),
+                                                              num_padding_bits_(CalcPaddingBits(num_bits_)),
                                                               num_packed_bytes_(other.num_bytes()),
                                                               packed_bytes_(new PackedByte[num_packed_bytes_]){
+
     memcpy(packed_bytes_, other.packed_bytes(), num_packed_bytes_);
   }
 
@@ -72,7 +74,12 @@ namespace rollercoaster{
     delete []packed_bytes_;
   }
 
+  /**
+   *Free Functions
+   */
 
+
+  
   int compare(const PackedSequence &lhs, const PackedSequence &rhs){
 
     for( int i=0;i<lhs.num_packed_bytes_;++i){
@@ -82,6 +89,11 @@ namespace rollercoaster{
         return 1;
     }
     return 0;
+  }
+
+
+  int write_to_stream(const PackedSequence &sequence, FILE *stream){
+    return fwrite(sequence.packed_bytes(),sizeof(char), sequence.num_bytes(), stream);
   }
 
 }

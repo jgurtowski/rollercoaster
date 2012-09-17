@@ -15,7 +15,7 @@ namespace rollercoaster{
      *Determine if the lookup has the given kmer
      *@return true: has it, false: doesn't have it
      */
-    virtual bool has_kmer(const PackedKmer &packed_kmer) = 0;
+    virtual bool has_record(const PackedKmer &packed_kmer) = 0;
 
     /**
      *Returns an unmodifiable reference to the last 
@@ -23,7 +23,7 @@ namespace rollercoaster{
      * If the kmer was not found, the count will be
      * set to -1
      */
-    virtual const KmerRecord &last_kmer() = 0;
+    virtual const KmerRecord &last_record() = 0;
     
     virtual ~AbstractKmerLookup(){}
     

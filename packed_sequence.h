@@ -1,6 +1,9 @@
 #ifndef PACKED_SEQUENCE_H
 #define PACKED_SEQUENCE_H
 
+#include <stdio.h>
+
+
 namespace rollercoaster{
 
   /**
@@ -65,8 +68,13 @@ namespace rollercoaster{
      *Static utility function for calculating the number of
      * bytes you need to hold a certain number of bits
      */
-    static inline int CalcBytesForBits(int bits){ return (8 / bits + (8 % bits > 0 ? 1 : 0));} 
+    static inline int CalcBytesForBits(int bits){ return (bits / 8 + ((bits % 8) > 0 ? 1 : 0));} 
 
+    /**
+     *Calculate the padding bits that are unused at the end of the bit array
+     */
+    static inline int CalcPaddingBits(int bits){ return (bits % 8 > 0 ? (8 - (bits % 8)):0);}
+    
 
     /**
      *Compare method for comparing two packed sequences
@@ -76,6 +84,14 @@ namespace rollercoaster{
 
     virtual ~PackedSequence();
 
+  private:
+    int num_bits_;
+    int num_padding_bits_;
+    int num_packed_bytes_;
+
+    //disallow assignment
+    const PackedSequence &operator=(const PackedSequence &);
+
   protected:
     /**
      *Copy constructor
@@ -84,16 +100,27 @@ namespace rollercoaster{
     
     PackedByte *packed_bytes_;
 
-  private:
-    int num_bits_;
-    int num_padding_bits_;
-    int num_packed_bytes_;
-
-    
-    //disallow assignment
-    const PackedSequence &operator=(const PackedSequence &);
 
   }; //class PackedSequence
+
+
+  /**
+   *Free Functions
+   */
+  
+  /**
+   *Compare two packed sequences by their raw bytes
+   */
+  int compare(const PackedSequence &lhs, const PackedSequence &rhs);
+
+  /**
+   *Write bytes to stream
+   *@return number of bytes written to stream
+   */
+  
+  int write_to_stream(const PackedSequence &sequence, FILE *out);
+
+
 
 }//namespace rollercoaster
 #endif

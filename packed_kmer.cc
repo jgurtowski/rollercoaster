@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdio.h>
 
 #include <assert.h>
 #include <iostream>
@@ -32,16 +33,8 @@ namespace rollercoaster{
                                         is_set_(false){
     
   }
-
-  void PackedKmer::set_kmer( std::string::const_iterator begin,
-                             std::string::const_iterator end){
-    end--;begin--;
-    for(;end != begin; --end){
-      push_bits(encode_base(*end),BitsPerBase);
-    }
-    is_set_ = true;
-  }
-      
+  
+    
   void PackedKmer::add_base(const char base){
     push_bits(encode_base(base),BitsPerBase);
     is_set_ = true;
@@ -84,5 +77,10 @@ namespace rollercoaster{
     is_set_ = true;
     return bytes;
   }
+
+  std::ostream &operator << (std::ostream &out, const PackedKmer &kmer){
+    return out<< kmer.str_kmer();
+  }
+
 
 }//namespace rollercoaster

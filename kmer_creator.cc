@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <iostream>
 
+#include "list_backed_kmer.h"
 #include "kmer_creator.h"
 
 
@@ -75,7 +76,7 @@ namespace rollercoaster{
   
   void KmerCreator::const_iterator::load_data(){
     if(!kmer_.is_set())
-      kmer_.set_kmer(read_.begin()+kmer_idx_, read_.begin()+kmer_idx_+kmer_size_);
+      kmer_.set_kmer<std::string>(read_.begin()+kmer_idx_,read_.begin()+(kmer_idx_+kmer_size_));
   }
 
   const KmerCreator::const_iterator &KmerCreator::const_iterator::operator++(){
@@ -105,8 +106,9 @@ namespace rollercoaster{
    */
 
   void KmerCreator::const_reverse_iterator::load_data(){
-    if(!kmer_.is_set())
-      kmer_.set_kmer(read_.begin()+kmer_idx_, read_.begin()+kmer_idx_+kmer_size_);
+    if(!kmer_.is_set()){
+      kmer_.set_kmer<std::string>(read_.begin()+kmer_idx_,read_.begin()+(kmer_idx_+kmer_size_));
+    }
   }
 
   const KmerCreator::const_reverse_iterator &KmerCreator::const_reverse_iterator::operator++(){
@@ -134,8 +136,9 @@ namespace rollercoaster{
    *for KmerCreator const_packed_reverse_iterator
    */
   void KmerCreator::const_packed_reverse_iterator::load_data(){
-    if(!packed_kmer_.is_set())
-      packed_kmer_.set_kmer(read_.begin()+kmer_idx_, read_.begin()+kmer_idx_+kmer_size_);
+    if(!packed_kmer_.is_set()){
+      packed_kmer_.set_kmer<std::string>(read_.begin()+kmer_idx_, read_.begin()+kmer_idx_+kmer_size_);
+    }
   }
 
   const KmerCreator::const_packed_reverse_iterator &KmerCreator::const_packed_reverse_iterator::operator++(){

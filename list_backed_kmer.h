@@ -16,15 +16,11 @@ namespace rollercoaster{
   class ListBackedKmer: public AbstractKmer{
 
   public:
+    
+    typedef std::list<char> list_type;
 
   ListBackedKmer(int kmer_size): is_set_(false),kmer_size_(kmer_size),list_kmer_(){}
-
-    inline void set_kmer(std::string::const_iterator begin,
-                         std::string::const_iterator end){
-      std::copy(begin, end, std::back_inserter(list_kmer_));
-      is_set_=true;
-    }
-
+    
     inline bool is_set() const {return is_set_;}
 
     inline void add_base_left(char base){
@@ -37,6 +33,27 @@ namespace rollercoaster{
       list_kmer_.push_back(base);
     }
 
+    inline std::list<char>::const_iterator begin() const {
+      return list_kmer_.begin();
+    }
+
+    inline std::list<char>::const_iterator end() const {
+      return list_kmer_.end();
+    }
+
+    /**
+     *Set Kmer with char iterators
+     */
+    template<class T>
+      void set_kmer(typename T::const_iterator begin,
+                    typename T::const_iterator end){
+      std::copy(begin, end, std::back_inserter(list_kmer_));
+      is_set_=true;
+    }
+
+
+    friend int compare(const ListBackedKmer &lhs, const ListBackedKmer &rhs);
+    
     virtual std::string str_kmer(){ return const_cast<const ListBackedKmer *>(this)->str_kmer();}
     
     std::string str_kmer() const;
@@ -44,13 +61,21 @@ namespace rollercoaster{
     void str_kmer(std::string &out) const;
 
 
+
+
   private:
     bool is_set_;
     int kmer_size_;
     std::list<char> list_kmer_;
-    
 
   }; //class ListBackedKmer
+
+  /***
+   *Free Functions
+   */
+
+  int compare(const ListBackedKmer &lhs, const ListBackedKmer &rhs);
+
 
 }//namespace rollercoaster
 

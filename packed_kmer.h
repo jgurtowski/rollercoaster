@@ -1,12 +1,12 @@
 #ifndef PACKED_KMER_H
 #define PACKED_KMER_H
 
+#include <iostream>
 #include <string>
+
 
 #include "abstract_kmer.h"
 #include "packed_sequence.h"
-
-
 
 namespace rollercoaster{
 
@@ -28,12 +28,26 @@ namespace rollercoaster{
      */
     int read_from_stream(char *stream);
 
+    
+    
+
     /**
      *Sets kmer using the characters between the iterators
      *begin and end
      */
-    void set_kmer(std::string::const_iterator begin,
-                  std::string::const_iterator end);
+    
+    template <class T> 
+      void set_kmer(typename T::const_iterator begin,
+                    typename T::const_iterator end){
+      clear();
+      end--;begin--;
+      for(;end != begin; --end){
+        push_bits(encode_base(*end),BitsPerBase);
+      }
+      is_set_ = true;
+    }
+    
+
     /**
      *Adds a base to the left most position in the packed Kmer
      *Because kmers are fixed length, the right most base will
@@ -71,12 +85,28 @@ namespace rollercoaster{
      */
     static char decode_base(const EncodedBase base);
 
-    
   private:
     int kmer_size_;
     bool is_set_;
 
   };
+
+
+  /**
+   *Free Functions
+   */
+
+  /**
+   *Write bytes to stream
+   *@return number of bytes written to stream
+   */
+  
+  int write_to_stream(PackedKmer &kmer, FILE *out);
+
+  /**
+   *Write out the string representation of the kmer
+   */
+  std::ostream &operator << (std::ostream &out, const PackedKmer &kmer);
 
 
 }//namespace rollercoaster
