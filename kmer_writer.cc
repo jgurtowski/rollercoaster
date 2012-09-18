@@ -1,10 +1,12 @@
 #include <stdlib.h>
 #include <stdint.h>
+#include <limits.h>
 
 #include <iostream>
 #include <string>
 
 #include "kmer_record.h"
+
 
 typedef struct RawKmerRecord_struct{
 
@@ -28,7 +30,12 @@ int parse_kmer(const std::string &line, RawKmerRecord *out){
   (out -> kmer).erase();
   std::copy(line.begin(), line.begin() + tab, std::back_inserter(out->kmer));
   std::copy(line.begin() + tab + 1 , line.end(), std::back_inserter(count));
-  out->count = atoi(count.c_str());
+  long int c =  atol(count.c_str());
+  if( c > INT_MAX )
+    out->count = INT_MAX;
+  else
+    out->count = static_cast<int>(c);
+
   return 0;
 }
 
