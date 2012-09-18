@@ -66,7 +66,7 @@ namespace rollercoaster{
   }
 
   char PackedKmer::decode_base(const EncodedBase base){
-    assert(base >=0 && base <= 4);
+    assert(base <= 4);
     return BitsToChar[base];
   }
 
