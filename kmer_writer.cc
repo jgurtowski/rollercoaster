@@ -39,34 +39,51 @@ int parse_kmer(const std::string &line, RawKmerRecord *out){
   return 0;
 }
 
+int parse_line(char *buffer, RawKmerRecord *out){
+  char delims[] = {'\t', '\n'};
+  char *result = strtok( buffer, delims);
+  if(NULL == result)
+    return 1;
+  out->kmer.assign(result);
+  result = strtok( NULL , delims);
+  if(NULL == result)
+    return 1;
+  long int c = atol(result);
+  if( c > INT_MAX)
+    out->count = INT_MAX;
+  else
+    out->count = static_cast<int>(c);
+
+  return 0;
+}
+
+
 int main(int argc, char *argv[]){
 
   namespace rc = rollercoaster;
-
-  std::string line;
+  
+  static size_t bufsize = 1024;
+  char *buffer = new char[bufsize];
+  
   RawKmerRecord raw_record;
 
-  getline(std::cin, line);
-  if(parse_kmer(line,&raw_record)){
+  getline(&buffer,&bufsize, stdin);
+  if(parse_line(buffer,&raw_record)){
     std::cerr << "Error reading kmer records" << std::endl;
     return 1;
   }
 
   int kmer_size = raw_record.kmer.length();
   if(fwrite(&kmer_size, sizeof(int), 1, stdout)){}
-  fflush(stdout);
   rc::KmerRecord record(kmer_size);
   record.set_kmer<std::string>(raw_record.kmer.begin(), raw_record.kmer.end());
   record.set_count(raw_record.count);
   rc::write_to_binary_stream(record,stdout);
-  fflush(stdout);
 
   uint64_t count = 2;
-  while(std::cin){
-    getline(std::cin, line);
-    if( 0 == static_cast<int>(line.size()))
-      continue;
-    if(parse_kmer(line, &raw_record)){
+  while(-1 != getline(&buffer, &bufsize,stdin)){
+    
+    if(parse_line(buffer, &raw_record)){
       std::cerr << "Error on record " << count << std::endl;
       return 1;
     }
@@ -77,10 +94,10 @@ int main(int argc, char *argv[]){
     record.set_kmer<std::string>(raw_record.kmer.begin(), raw_record.kmer.end());
     record.set_count(raw_record.count);
     rc::write_to_binary_stream(record,stdout);
-    fflush(stdout);
     ++count;
   }
 
-  return 0;
+  delete []buffer;
 
+  return 0;
 }

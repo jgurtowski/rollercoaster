@@ -1,12 +1,12 @@
 CC=g++
-CFLAGS=-Wall -O3
+CFLAGS=-Wall -O3 -ggdb
 
 BINARIES=kmerwrite kmerlookup
 
 all: $(BINARIES)
 
 %.o: %.cc
-	$(CC) $(CFLAGS) -ggdb -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 KMERWRITE_O = kmer_writer.o kmer_record.o packed_kmer.o packed_sequence.o
 kmerwrite: $(KMERWRITE_O)
