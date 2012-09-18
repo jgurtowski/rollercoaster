@@ -93,7 +93,7 @@ namespace rollercoaster{
 
 
   int write_to_stream(const PackedSequence &sequence, FILE *stream){
-    return fwrite(sequence.packed_bytes(),sizeof(char), sequence.num_bytes(), stream);
+    return fwrite(sequence.packed_bytes(),sizeof(char), sequence.num_bytes(), stream) * sizeof(char);
   }
 
 }

@@ -5,7 +5,7 @@
 #include "mmap_kmer_lookup.h"
 #include "packed_kmer.h"
 #include "packed_sequence.h"
-
+#include "kmer_record.h"
 
 namespace rollercoaster{
 
@@ -14,15 +14,20 @@ namespace rollercoaster{
     mmap_db_(file.mapped_data()),
     header_size_(sizeof(int)),
     record_size_(),
+    kmer_size_(),
     num_records_(),
-    kmer_size_(){
+    kmer_record_(){
     
     assert(file.is_mapped());
     
-
     memcpy(&kmer_size_, mmap_db_, header_size_);
-    record_size_ = PackedSequence::CalcBytesForBits( kmer_size_ * PackedKmer::BitsPerBase );
+    kmer_record_ = new KmerRecord(kmer_size_);
+    record_size_ = PackedSequence::CalcBytesForBits( kmer_size_ * PackedKmer::BitsPerBase ) + sizeof(int);
     num_records_ = (file.size() - header_size_) / record_size_; 
+  }
+
+  MMapKmerLookup::~MMapKmerLookup(){
+    delete kmer_record_;
   }
 
   
@@ -35,8 +40,8 @@ namespace rollercoaster{
     while( l <= r){
       cur = (l+r)/2;
       read_record_at(cur);
-      
-      diff = compare(packed_kmer,kmer_record_.kmer());
+
+      diff = compare(packed_kmer,kmer_record_->kmer());
       if(diff < 0 )
         r = cur -1;
       else if( diff > 0 )
@@ -44,7 +49,7 @@ namespace rollercoaster{
       else
         return true;
     }
-    kmer_record_.clear();
+    kmer_record_->clear();
     return false;
   }
 

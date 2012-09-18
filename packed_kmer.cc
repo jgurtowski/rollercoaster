@@ -31,7 +31,6 @@ namespace rollercoaster{
   PackedKmer::PackedKmer(int kmer_size):PackedSequence(BitsPerBase * kmer_size),
                                         kmer_size_(kmer_size),
                                         is_set_(false){
-    
   }
   
     
@@ -79,7 +78,7 @@ namespace rollercoaster{
   }
 
   std::ostream &operator << (std::ostream &out, const PackedKmer &kmer){
-    return out<< kmer.str_kmer();
+    return out << kmer.str_kmer();
   }
 
 

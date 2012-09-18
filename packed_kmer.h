@@ -27,8 +27,6 @@ namespace rollercoaster{
      *@return number of bytes read from stream
      */
     int read_from_stream(char *stream);
-
-    
     
 
     /**
@@ -88,6 +86,8 @@ namespace rollercoaster{
   private:
     int kmer_size_;
     bool is_set_;
+    
+    const PackedKmer &operator=(const PackedKmer &);
 
   };
 

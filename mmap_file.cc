@@ -11,7 +11,7 @@ namespace rollercoaster{
     if( 0 == file_handle_)
       return 1;
     fstat(file_handle_, &statbuf_);
-    mapped_data_ = (char *)mmap(0,statbuf_.st_size,PROT_READ,MAP_SHARED,file_handle_,0);
+    mapped_data_ = (char *) mmap(0,statbuf_.st_size,PROT_READ,MAP_SHARED,file_handle_,0);
     if( 0 == MAP_FAILED){
       close(file_handle_);
       return 1;

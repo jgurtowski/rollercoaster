@@ -16,7 +16,7 @@ namespace rollercoaster{
   int write_to_binary_stream(const KmerRecord &kmer, FILE *out){
     int nb = write_to_stream(kmer.kmer(), out);
     int count = kmer.count();
-    int written = fwrite(&count,sizeof(KmerRecord::KmerCount),1,out);
+    int written = fwrite(&count,sizeof(KmerRecord::KmerCount),1,out) * sizeof(KmerRecord::KmerCount);
     return (nb + written);
   }
 
