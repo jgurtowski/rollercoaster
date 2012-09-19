@@ -17,7 +17,7 @@ kmerlookup: $(KMERLOOKUP_O)
 	$(CC) $(CFLAGS) $(KMERLOOKUP_O) -o kmerlookup
 
 
-READCORRECTOR_O = read_corrector.o fastq_record.o het_corrector.o abstract_kmer_lookup.o mmap_file.o mmap_kmer_lookup.o kmer_creator.o packed_kmer.o packed_sequence.o list_backed_kmer.o kmer_record.o
+READCORRECTOR_O = read_corrector.o fastq_record.o het_corrector.o abstract_kmer_lookup.o mmap_file.o mmap_kmer_lookup.o kmer_creator.o packed_kmer.o packed_sequence.o list_backed_kmer.o kmer_record.o coverage_segment.o
 readcorrector: $(READCORRECTOR_O)
 	$(CC) -lpthread $(CFLAGS) $(READCORRECTOR_O) -o readcorrector
 

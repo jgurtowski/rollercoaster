@@ -43,7 +43,15 @@ int main(int argc, char *argv[]){
 
   rc::ThreadedQueue<rc::HetCorrector::ReadPair> read_queue;
   
-  rc::HetCorrector corrector(mmap_db, &read_queue); 
+  rc::HetCorrector::CorrectorConfig corrector_conf = { 
+    /*.max_corrections =*/ 8,
+    /*.max_strange_segments =*/ 4,
+    /*.min_segment_length =*/ 3,
+    /*.max_repeat_coverage =*/ 500,
+    /*.segment_threshold = */ 17.5
+  };
+  
+  rc::HetCorrector corrector(mmap_db, corrector_conf, &read_queue); 
   
   rc::ThreadExecutor<rc::HetCorrector> executor;
 
