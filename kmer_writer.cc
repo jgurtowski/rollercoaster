@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <limits.h>
+#include <string.h>
 
 #include <iostream>
 #include <string>
@@ -67,7 +68,7 @@ int main(int argc, char *argv[]){
   
   RawKmerRecord raw_record;
 
-  getline(&buffer,&bufsize, stdin);
+  if(getline(&buffer,&bufsize, stdin)){}
   if(parse_line(buffer,&raw_record)){
     std::cerr << "Error reading kmer records" << std::endl;
     return 1;

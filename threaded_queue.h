@@ -40,8 +40,9 @@ namespace rollercoaster{
 
     /**
      *Pops waiting item from the queue
+     *Copies data to object pointed to by 'out'
      *@param out place to save the item to
-     *@return 0: successfully got data, 1: No data 
+     *@return 1: successfully got data, 0: No data 
      */
     int pop(T *out){
       pthread_mutex_lock(&mutex_);
@@ -51,14 +52,14 @@ namespace rollercoaster{
 
       if(done_){
         pthread_mutex_unlock(&mutex_);
-        return 1;
+        return 0;
       }
 
       *out = data_;
       empty_ = true;
       pthread_cond_broadcast(&cond_);
       pthread_mutex_unlock(&mutex_);
-      return 0;
+      return 1;
     }
 
 

@@ -24,6 +24,7 @@ namespace rollercoaster{
       statbuf_(),
       is_mapped_(false)
       {}
+
     ~MMapFile();
     
     /**

@@ -21,7 +21,7 @@ namespace rollercoaster{
     MMapKmerLookup(MMapFile &file);
     ~MMapKmerLookup();
 
-    inline int kmer_size() const { return kmer_size_; }
+    int kmer_size() const { return kmer_size_; }
 
     virtual bool has_record(const PackedKmer &packed_kmer);
     virtual const KmerRecord &last_record(){return *kmer_record_;}

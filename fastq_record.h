@@ -32,9 +32,13 @@ namespace rollercoaster{
   public:
     static const size_t LineBufferSize = 10024;
 
-  FastqRecordReader(FILE *infile):input_file_(infile),line_buffer_(new char[LineBufferSize]){}
+    FastqRecordReader(std::string &filename);
+    
+    bool is_open() const { return (NULL == input_file_ ? false : true); }
 
     ~FastqRecordReader(){
+      if(NULL != input_file_)
+        fclose(input_file_);
       delete []line_buffer_;
     }
 
