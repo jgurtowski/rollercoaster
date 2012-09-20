@@ -26,6 +26,8 @@ namespace rollercoaster{
   void segment_counts(const std::vector<int> &counts, float threshold,
                       std::vector<Segment> *segments_out);
 
+  
+  bool operator == (const Segment &lhs, const Segment &rhs);
 
 
 }//namespace rollercoaster

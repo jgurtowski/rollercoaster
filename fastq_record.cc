@@ -10,6 +10,16 @@ namespace rollercoaster{
                                                               line_buffer_(new char[LineBufferSize]){
   }
   
+
+
+  std::ostream &operator << (std::ostream &out, const FastqRecord &record){
+    out << "@" << record.name() << std::endl;
+    out << record.sequence() << std::endl;
+    out << "+" << record.description() << std::endl;
+    out << record.quality();
+    return out;
+  }
+
   bool operator >> (FastqRecordReader &reader, FastqRecord &record){
     size_t buf_size = FastqRecordReader::LineBufferSize;
 

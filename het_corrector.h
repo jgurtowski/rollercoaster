@@ -13,9 +13,6 @@
 
 namespace rollercoaster{
 
-
-
-
   class HetCorrector: public Runnable{
   public:
     typedef std::pair<FastqRecord, FastqRecord> ReadPair;
@@ -54,9 +51,9 @@ namespace rollercoaster{
       
   HetCorrector(MMapFile &mapped_file, const CorrectorConfig &config, ThreadedQueue<ReadPair> *read_queue):
       mapped_file_(mapped_file),
-      read_queue_(read_queue),
-      read_pair_(),
-      config_(config){}
+        read_queue_(read_queue),
+        read_pair_(),
+        config_(config){}
 
 
     virtual void run();
@@ -68,7 +65,11 @@ namespace rollercoaster{
      */
     int correct_read(std::string read, AbstractKmerLookup &lookup, std::vector<ReadChange> *changes);
 
-    
+    /**
+     *Find kmer with highest coverage
+     */
+    char find_max_kmer_mutate_base(AbstractKmerLookup &lookup, std::string kmer, BaseToModify mod_base);
+
   private:
     MMapFile &mapped_file_;
     ThreadedQueue<ReadPair> *read_queue_;

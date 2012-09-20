@@ -2,6 +2,7 @@
 #define FASTQ_RECORD_H
 #include <stdio.h>
 
+#include <iostream>
 #include <string>
 
 namespace rollercoaster{
@@ -14,6 +15,9 @@ namespace rollercoaster{
     const std::string &sequence() const {return sequence_;}
     const std::string &description() const {return description_;}
     const std::string &quality() const {return quality_;}
+    
+    void set_sequence_char(int idx, char base){ sequence_[idx] = base; }
+    void set_quality_char(int idx, char base){ quality_[idx] = base; }
 
     friend bool operator >> (FastqRecordReader &reader, FastqRecord &record);
 
@@ -58,6 +62,7 @@ namespace rollercoaster{
 
   bool operator >> (FastqRecordReader &reader, FastqRecord &record);
 
+  std::ostream &operator << (std::ostream &out, const FastqRecord &record);
 
 }//namespace rollercoaster
 
