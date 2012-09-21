@@ -81,12 +81,12 @@ namespace rollercoaster{
 
   
   int compare(const PackedSequence &lhs, const PackedSequence &rhs){
-
-    for( int i=0;i<lhs.num_packed_bytes_;++i){
-      if(lhs.packed_bytes_[i] < rhs.packed_bytes_[i])
-        return -1;
-      else if(lhs.packed_bytes_[i] > rhs.packed_bytes_[i])
-        return 1;
+    const PackedSequence::PackedByte *f = lhs.packed_bytes_ , *s = rhs.packed_bytes_, *e = lhs.packed_bytes_ + lhs.num_packed_bytes_ ;
+    while( f != e ){
+      if(*f < *s)
+	return -1;
+      if(*f++ > *s++)
+	return 1;
     }
     return 0;
   }

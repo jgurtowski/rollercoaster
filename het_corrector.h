@@ -1,6 +1,7 @@
 #ifndef HET_CORRECTOR_H
 #define HET_CORRECTOR_H
 
+#include <set>
 #include <vector>
 #include <utility>
 
@@ -60,10 +61,10 @@ namespace rollercoaster{
     virtual ~HetCorrector(){}
 
     /**
-     *Operate on a copy of the read and return a vector of changes
+     *Operate on a copy of the read and return a set of changes
      *@return 0: success , 1:failure
      */
-    int correct_read(std::string read, AbstractKmerLookup &lookup, std::vector<ReadChange> *changes);
+    CorrectionStat correct_read(const std::string &read, AbstractKmerLookup &lookup, std::set<ReadChange> *changes);
 
     /**
      *Find kmer with highest coverage
@@ -86,8 +87,11 @@ namespace rollercoaster{
    *Free Functions
    */
   
-  void implement_read_changes(const std::vector<HetCorrector::ReadChange> &changes, FastqRecord *record);
-  
+  void implement_read_changes(const std::set<HetCorrector::ReadChange> &changes, FastqRecord *record);
+
+  std::ostream &operator << (std::ostream &out, const HetCorrector::ReadChange &change);
+
+  bool operator < (const HetCorrector::ReadChange &lhs, const HetCorrector::ReadChange &rhs);
 
 }//namespace rollercoaster
 

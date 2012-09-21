@@ -18,8 +18,10 @@ namespace rollercoaster{
         cur.left = left;
         cur.right = i-1;
         cur.mean = sum / static_cast<double>(i-left);
-        segments_out->push_back(cur);
-        sum = counts[i];
+	segments_out->push_back(cur);
+        
+	left = i;
+	sum = counts[i];
       }else{
         sum += counts[i];
       }
@@ -37,5 +39,11 @@ namespace rollercoaster{
     //simple structure, just byte compare
     return 0 == memcmp(&lhs,&rhs,sizeof(Segment));
   }
+
+
+  /*std::ostream &operator << (std::ostream &out, const Segment &segment){
+    out << "{l:" << segment.left << ",r:" << segment.right << ",m:" << segment.mean << "}";
+    return out;
+    }*/
 
 }//namespace rollercoaster

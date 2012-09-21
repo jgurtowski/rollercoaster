@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+#include <iostream>
 #include <vector>
 #include <cmath>
 
@@ -28,6 +29,8 @@ namespace rollercoaster{
 
   
   bool operator == (const Segment &lhs, const Segment &rhs);
+
+  //std::ostream &operator << (std::ostream &out, const Segment &segment);
 
 
 }//namespace rollercoaster

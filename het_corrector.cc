@@ -11,8 +11,8 @@ namespace rollercoaster{
 
   PthreadMutex HetCorrector::__io_mutex;
 
-  void implement_read_changes(const std::vector<HetCorrector::ReadChange> &changes, FastqRecord *record){
-    std::vector<HetCorrector::ReadChange>::const_iterator it = changes.begin(), end=changes.end();
+  void implement_read_changes(const std::set<HetCorrector::ReadChange> &changes, FastqRecord *record){
+    std::set<HetCorrector::ReadChange>::const_iterator it = changes.begin(), end=changes.end();
     for(;it != end; ++it){
       record->set_sequence_char( it->position, it->new_base);
       record->set_quality_char( it->position, ':' );
@@ -26,26 +26,33 @@ namespace rollercoaster{
     }
     
     MMapKmerLookup lookup( mapped_file_ );
-    std::vector<ReadChange> changes;
-
+    std::set<ReadChange> changes;
+    
+    HetCorrector::CorrectionStat stat;
     while(read_queue_->pop(&read_pair_)){
+      
       //got the read, correct it and print 
-      if(SUCCESS == correct_read(read_pair_.first.sequence(), lookup, &changes)){
+      if(SUCCESS == (stat = correct_read(read_pair_.first.sequence(), lookup, &changes))){
         implement_read_changes(changes, &read_pair_.first);
-      }
-
-      if(SUCCESS == correct_read(read_pair_.second.sequence(), lookup, &changes)){
-        implement_read_changes(changes,&read_pair_.second);
       }
 
       __io_mutex.lock();
       std::cout << read_pair_.first << std::endl;
+      __io_mutex.unlock();
+      
+      if(SUCCESS == (stat = correct_read(read_pair_.second.sequence(), lookup, &changes))){
+        implement_read_changes(changes,&read_pair_.second);
+      }
+      
+      __io_mutex.lock();
       std::cout << read_pair_.second << std::endl;
       __io_mutex.unlock();
+      
     }
+    
   }
 
-  int HetCorrector::correct_read(std::string read, AbstractKmerLookup &lookup, std::vector<ReadChange> *changes){
+  HetCorrector::CorrectionStat HetCorrector::correct_read(const std::string &read, AbstractKmerLookup &lookup, std::set<ReadChange> *changes){
 
     changes->clear();
 
@@ -61,9 +68,9 @@ namespace rollercoaster{
     int num_iterations =0;
     do{
       old_segments = segments;
-      kmer_counts_for_read(read_pair_.first.sequence(),lookup, &counts);
+      kmer_counts_for_read(read,lookup, &counts);
       segment_counts(counts,config_.segment_threshold, &segments);
-
+            
       itb = segments.begin();
       ite = segments.end();
 
@@ -77,14 +84,14 @@ namespace rollercoaster{
 
       if(strange_segments >= config_.max_strange_segments)
         return STRANGE_SEGMENTS;
-
+      
       for(int i=0;i<static_cast<int>(segments.size()); ++i){
         if( i>0 && segments[i].mean > segments[i-1].mean){ //check left segment
           curr_pos = segments[i-1].right;
           new_base = find_max_kmer_mutate_base(lookup,std::string(read,curr_pos,lookup.kmer_size()), FIRST);
           if(new_base != read[curr_pos]){
             ReadChange read_change = {curr_pos,read[curr_pos],new_base};
-            changes->push_back(read_change);
+            changes->insert(read_change);
           }
         }
         if( i< static_cast<int>(segments.size())-1 && segments[i].mean > segments[i+1].mean){ //check to right
@@ -93,22 +100,22 @@ namespace rollercoaster{
           new_base = find_max_kmer_mutate_base(lookup,std::string(read,curr_pos,lookup.kmer_size()), LAST);
           if( new_base != read[mod_pos] ){
             ReadChange read_change = {mod_pos, read[mod_pos], new_base};
-            changes->push_back(read_change);
+            changes->insert(read_change);
           }
         }
       }
-
+      
       if(++num_iterations >= config_.max_corrections+1 )
         return TOO_MANY_CHANGES;
 
-    }while(!std::equal(old_segments.begin(),old_segments.end(),segments.begin()));
+    }while(segments.size() != old_segments.size() || !std::equal(segments.begin(), segments.end(), old_segments.begin()));
 
     return SUCCESS;
   }
 
 
   char HetCorrector::find_max_kmer_mutate_base(AbstractKmerLookup &lookup, std::string kmer, BaseToModify mod_base){
-
+    
     std::string rev_kmer;
     rev_kmer.resize(kmer.size());
     reverse_complement(kmer.rbegin(),kmer.rend(), rev_kmer.begin());
@@ -120,10 +127,10 @@ namespace rollercoaster{
     for(int i=0;i<4; ++i){
       if(mod_base == FIRST){
         kmer[0] = PackedKmer::decode_base(i);
-        rev_kmer[rev_kmer.size()-1] = complement_lookup(i);
+        rev_kmer[rev_kmer.size()-1] = complement_lookup(PackedKmer::decode_base(i));
       }else{
-        kmer[kmer.size()-1] = PackedKmer::decode_base(i);
-        rev_kmer[0] = complement_lookup(i);
+	kmer[kmer.size()-1] = PackedKmer::decode_base(i);
+        rev_kmer[0] = complement_lookup(PackedKmer::decode_base(i));
       }
 
       packed_kmer.set_kmer<std::string>(kmer.begin(),kmer.end());
@@ -141,5 +148,16 @@ namespace rollercoaster{
     }
     return max_letter;
   }
+
+
+  std::ostream &operator << (std::ostream &out, const HetCorrector::ReadChange &change){
+    out << "{p:" << change.position <<  ",o:" << change.old_base << ",n:" << change.new_base << "}";
+    return out;
+  }
+
+  bool operator<(const HetCorrector::ReadChange &lhs, const HetCorrector::ReadChange &rhs){
+    return lhs.position < rhs.position;
+  }
+
 
 }//namespace rollercoaster

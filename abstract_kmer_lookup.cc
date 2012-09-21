@@ -8,6 +8,7 @@ namespace rollercoaster{
 
   void kmer_counts_for_read(const std::string &read, AbstractKmerLookup &lookup, std::vector<int> *out){
     out->clear();
+    
     std::string reverse;
     reverse.resize(read.size()); //not pretty
     KmerCreator fw(read, lookup.kmer_size());
@@ -26,7 +27,6 @@ namespace rollercoaster{
         packed_kmer.set_kmer<ListBackedKmer::list_type>(fw_b->begin(), fw_b->end());
       else
         packed_kmer.set_kmer<ListBackedKmer::list_type>(rv_b->begin(), rv_b->end());
-
       out->push_back( lookup.has_record(packed_kmer) ? lookup.last_record().count():-2 );
     }
   }

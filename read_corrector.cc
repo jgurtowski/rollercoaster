@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdint.h>
 
 #include <iostream>
 #include <utility>
@@ -58,8 +59,11 @@ int main(int argc, char *argv[]){
   executor.execute(corrector, num_threads);
   
   rc::HetCorrector::ReadPair read_pair;
+  uint64_t count = 0;
   while( reader_1 >> read_pair.first && reader_2 >> read_pair.second){
     read_queue.put(read_pair);  
+    if(0 == ++count % 1000000)
+      std::cerr << "Processed Pairs: " << count << std::endl;
   }
   
   read_queue.finish();
