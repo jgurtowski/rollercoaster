@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "abstract_kmer_lookup.h"
 #include "kmer_creator.h"
 #include "packed_kmer.h"
@@ -6,7 +8,8 @@
 
 namespace rollercoaster{
 
-  void kmer_counts_for_read(const std::string &read, AbstractKmerLookup &lookup, std::vector<int> *out){
+  /*
+    void kmer_counts_for_read_slow(const std::string &read, AbstractKmerLookup &lookup, std::vector<int> *out){
     out->clear();
     
     std::string reverse;
@@ -29,6 +32,30 @@ namespace rollercoaster{
         packed_kmer.set_kmer<ListBackedKmer::list_type>(rv_b->begin(), rv_b->end());
       out->push_back( lookup.has_record(packed_kmer) ? lookup.last_record().count():-2 );
     }
+    }
+  */
+
+  void kmer_counts_for_read(const std::string &read, AbstractKmerLookup &lookup, std::vector<int> *out){
+    out -> clear();
+    std::string reverse;
+    reverse.resize(read.size());
+    reverse_complement(read.rbegin(),read.rend(), reverse.begin());
+
+    KmerCreator fw(read, lookup.kmer_size());
+    KmerCreator rv(reverse, lookup.kmer_size());
+
+    KmerCreator::const_packed_reverse_iterator fw_b = fw.packed_rbegin(), fw_e = fw.packed_rend();
+    KmerCreator::const_packed_iterator rv_b = rv.packed_begin(), rv_e = rv.packed_end();
+    int diff;
+    for(; fw_b != fw_e && rv_b != rv_e; ++fw_b, ++rv_b){
+	
+      diff = compare( *fw_b, *rv_b);
+      if(diff < 0)
+	out->push_back(lookup.has_record(*fw_b) ? lookup.last_record().count(): -2 );
+      else
+	out->push_back(lookup.has_record(*rv_b) ? lookup.last_record().count(): -2 );
+    }
+    std::reverse(out->begin(), out->end());
   }
 
 

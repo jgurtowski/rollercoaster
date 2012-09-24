@@ -30,8 +30,7 @@ namespace rollercoaster{
   
   bool operator == (const Segment &lhs, const Segment &rhs);
 
-  //std::ostream &operator << (std::ostream &out, const Segment &segment);
-
+  std::ostream &operator << (std::ostream &out, const Segment &segment);
 
 }//namespace rollercoaster
 

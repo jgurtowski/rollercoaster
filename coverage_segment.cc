@@ -12,7 +12,7 @@ namespace rollercoaster{
 
     Segment cur;
     int left = 0, i = 1;
-    uint64_t sum = counts[0];
+    int64_t sum = counts[0];
     for(;i<static_cast<int>(counts.size());++i){
       if(std::abs(counts[i-1] - counts[i]) > threshold){
         cur.left = left;
@@ -41,9 +41,10 @@ namespace rollercoaster{
   }
 
 
-  /*std::ostream &operator << (std::ostream &out, const Segment &segment){
+  std::ostream &operator << (std::ostream &out, const Segment &segment){
     out << "{l:" << segment.left << ",r:" << segment.right << ",m:" << segment.mean << "}";
     return out;
-    }*/
+  }
+
 
 }//namespace rollercoaster

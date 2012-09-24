@@ -19,32 +19,6 @@ namespace rollercoaster{
     read_ = read;//make an internal copy of the outside read
   }
 
-  KmerCreator::const_packed_reverse_iterator KmerCreator::packed_rbegin(){
-    return KmerCreator::const_packed_reverse_iterator(read_, kmer_size_, read_.length() - kmer_size_);
-  }
-
-  KmerCreator::const_packed_reverse_iterator KmerCreator::packed_rend(){
-    return KmerCreator::const_packed_reverse_iterator(read_, kmer_size_, -1);
-  }
-
-  KmerCreator::const_iterator KmerCreator::begin(){
-    return KmerCreator::const_iterator(read_, kmer_size_, 0);
-  }
-
-  KmerCreator::const_iterator KmerCreator::end(){
-    return KmerCreator::const_iterator(read_,kmer_size_, read_.length() - kmer_size_ + 1);
-  }
-
-  KmerCreator::const_reverse_iterator KmerCreator::rbegin(){
-    return KmerCreator::const_reverse_iterator(read_,kmer_size_, read_.length() - kmer_size_);
-  }
-
-  KmerCreator::const_reverse_iterator KmerCreator::rend(){
-    return KmerCreator::const_reverse_iterator(read_, kmer_size_, -1);
-  }
-  
-
-
   /**
    *base_iterator
    */
@@ -142,10 +116,12 @@ namespace rollercoaster{
   }
 
   const KmerCreator::const_packed_reverse_iterator &KmerCreator::const_packed_reverse_iterator::operator++(){
+    load_data();
+    
     --kmer_idx_;
     if(kmer_idx_ < 0)
       return *this;
-    packed_kmer_.add_base(read_[kmer_idx_]);
+    packed_kmer_.add_base_right(read_[kmer_idx_]);
     return *this;
   }
 
@@ -158,6 +134,37 @@ namespace rollercoaster{
     load_data();
     return &packed_kmer_;
   }
+
+
+  /**
+   *for KmerCreator const_packed_iterator
+   */
+  void KmerCreator::const_packed_iterator::load_data(){
+    if(!packed_kmer_.is_set()){
+      packed_kmer_.set_kmer<std::string>(read_.begin(),read_.begin()+kmer_size_);
+    }
+  }
+
+  const KmerCreator::const_packed_iterator &KmerCreator::const_packed_iterator::operator++(){
+    load_data();
+
+    ++kmer_idx_;
+    if(kmer_idx_ > (static_cast<int>(read_.size()) - kmer_size_))
+      return *this;
+    packed_kmer_.add_base_left(read_[kmer_idx_ + (kmer_size_-1)]);
+    return *this;
+  }
+
+  const PackedKmer &KmerCreator::const_packed_iterator::operator*(){
+    load_data();
+    return packed_kmer_;
+  }
+
+  const PackedKmer *KmerCreator::const_packed_iterator::operator->(){
+    load_data();
+    return &packed_kmer_;
+  }
+  
 
   
 }//namespace rollercoaster

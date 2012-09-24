@@ -34,10 +34,16 @@ namespace rollercoaster{
   }
   
     
-  void PackedKmer::add_base(const char base){
-    push_bits(encode_base(base),BitsPerBase);
+  void PackedKmer::add_base_right(const char base){
+    push_bits_right(encode_base(base),BitsPerBase);
     is_set_ = true;
   }
+
+  void PackedKmer::add_base_left(const char base){
+    push_bits_left(encode_base(base), BitsPerBase);
+    is_set_ = true;
+  }
+
 
   void PackedKmer::str_kmer(std::string *kmer_out) const{
     if(kmer_size_ != static_cast<int>(kmer_out->size()))

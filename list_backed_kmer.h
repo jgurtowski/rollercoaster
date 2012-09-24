@@ -2,8 +2,9 @@
 #define LIST_BACKED_KMER_H
 
 #include <iterator>
-#include <list>
+#include <deque>
 #include <string>
+#include <iosfwd>
 
 #include "abstract_kmer.h"
 
@@ -16,11 +17,11 @@ namespace rollercoaster{
   class ListBackedKmer: public AbstractKmer{
 
   public:
-    
-    typedef std::list<char> list_type;
+
+    typedef std::deque<char> list_type;
 
   ListBackedKmer(int kmer_size): is_set_(false),kmer_size_(kmer_size),list_kmer_(){}
-    
+
     inline bool is_set() const {return is_set_;}
 
     inline void add_base_left(char base){
@@ -33,11 +34,11 @@ namespace rollercoaster{
       list_kmer_.push_back(base);
     }
 
-    inline std::list<char>::const_iterator begin() const {
+    inline list_type::const_iterator begin() const {
       return list_kmer_.begin();
     }
 
-    inline std::list<char>::const_iterator end() const {
+    inline list_type::const_iterator end() const {
       return list_kmer_.end();
     }
 
@@ -53,11 +54,11 @@ namespace rollercoaster{
 
 
     friend int compare(const ListBackedKmer &lhs, const ListBackedKmer &rhs);
-    
+
     virtual std::string str_kmer(){ return const_cast<const ListBackedKmer *>(this)->str_kmer();}
-    
+
     std::string str_kmer() const;
-    
+
     void str_kmer(std::string &out) const;
 
 
@@ -66,7 +67,7 @@ namespace rollercoaster{
   private:
     bool is_set_;
     int kmer_size_;
-    std::list<char> list_kmer_;
+    list_type list_kmer_;
 
   }; //class ListBackedKmer
 

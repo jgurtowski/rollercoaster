@@ -40,7 +40,7 @@ namespace rollercoaster{
       clear();
       end--;begin--;
       for(;end != begin; --end){
-        push_bits(encode_base(*end),BitsPerBase);
+        push_bits_right(encode_base(*end),BitsPerBase);
       }
       is_set_ = true;
     }
@@ -51,7 +51,9 @@ namespace rollercoaster{
      *Because kmers are fixed length, the right most base will
      *be dropped to make room for the incoming base
      */
-    void add_base(const char base);
+    void add_base_right(const char base);
+    void add_base_left(const char base);
+
 
     /**
      *Overrides the AbstractKmer method 

@@ -30,7 +30,8 @@ namespace rollercoaster{
      * if byte is 00000011 and num_bits = 3 
      * the bits 011 will be pushed onto the left of the bit array
      */
-    void push_bits(PackedByte byte, int num_bits);
+    void push_bits_right(PackedByte byte, int num_bits);
+    void push_bits_left(PackedByte byte, int num_bits);
   
 
     /**
@@ -120,6 +121,23 @@ namespace rollercoaster{
   
   int write_to_stream(const PackedSequence &sequence, FILE *out);
 
+// ============================================================================
+//                            INLINE DEFINITIONS
+// ============================================================================
+
+// FREE FUNCTIONS
+inline
+int compare(const PackedSequence &lhs, const PackedSequence &rhs)
+{
+    const PackedSequence::PackedByte *f = lhs.packed_bytes_ ,
+          *s = rhs.packed_bytes_,
+          *e = lhs.packed_bytes_ + lhs.num_packed_bytes_ ;
+    int result = 0;
+    while(!result && f != e ){
+        result = *f++ - *s++;
+    }
+    return result;
+}
 
 
 }//namespace rollercoaster

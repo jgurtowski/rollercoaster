@@ -134,6 +134,27 @@ namespace rollercoaster{
 
 
 
+    /**
+     *Class: const_packed_iterator
+     *Iterate through Kmers, provide a packed version of each kmer
+     */
+    class const_packed_iterator: public base_iterator{
+    public:
+
+    const_packed_iterator(const std::string &input_str, int kmer_size, int kmer_index):
+      base_iterator(input_str,kmer_size,kmer_index),packed_kmer_(kmer_size_){}
+
+      virtual const const_packed_iterator &operator++();
+      virtual const PackedKmer &operator*();
+      virtual const PackedKmer *operator->();
+
+    private:
+
+      void load_data();
+      PackedKmer packed_kmer_;
+    };//class const_packed_iterator
+
+
     KmerCreator(const std::string &read, int kmer_size);
 
     //Set the next read to be kmerized
@@ -144,37 +165,64 @@ namespace rollercoaster{
      *Get const_packed_reverse_iterator to the beginning
      * (remember this is a reverse iterator)
      */
-    const_packed_reverse_iterator packed_rbegin();
-
+    inline const_packed_reverse_iterator packed_rbegin(){
+      return const_packed_reverse_iterator(read_, kmer_size_, read_.length() - kmer_size_);
+    }
 
     /**
      *Get const_packed_reverse_iterator to the end
      * (remember this is a reverse iterator)
      */
-    const_packed_reverse_iterator packed_rend();
+    inline const_packed_reverse_iterator packed_rend(){
+      return const_packed_reverse_iterator(read_, kmer_size_, -1);
+    }
+    
+    
+    /**
+     *Get const_packed_iterator to the beginning
+     */
+    inline const_packed_iterator packed_begin(){
+      return const_packed_iterator(read_, kmer_size_, 0);
+    }
 
-
+    /**
+     *Get const_packed_iterator to the end
+     */
+    inline const_packed_iterator packed_end(){
+      return const_packed_iterator(read_, kmer_size_, read_.length() - kmer_size_ + 1);
+    }
+    
+        
     /**
      *Get const_iterator to the beginning 
      */
-    const_iterator begin();
+    inline const_iterator begin(){
+      return const_iterator(read_, kmer_size_, 0);
+    }
+
     
     /**
      *Get const_iterator to end
      */
-    const_iterator end();
+    inline const_iterator end(){
+      return const_iterator(read_,kmer_size_, read_.length() - kmer_size_ + 1);
+    }
 
     /**
      *Get const_reverse_iterator to the beginning
      */
-    const_reverse_iterator rbegin();
+    inline const_reverse_iterator rbegin(){
+      return const_reverse_iterator(read_,kmer_size_, read_.length() - kmer_size_);
+    }
 
     /**
      *Get const_reverse_iterator to the end
      */
-    const_reverse_iterator rend();
+    inline const_reverse_iterator rend(){
+      return const_reverse_iterator(read_, kmer_size_, -1);
+    }
     
-
+    
   private:
     std::string read_;
     int kmer_size_;

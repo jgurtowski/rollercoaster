@@ -23,7 +23,43 @@ namespace rollercoaster{
   }
 
 
-  void PackedSequence::push_bits(PackedSequence::PackedByte byte, int num_bits){
+  
+  void PackedSequence::push_bits_right(PackedSequence::PackedByte byte, int num_bits){
+    PackedByte *cur = packed_bytes_ + (num_packed_bytes_ -1);
+    PackedByte transfer_mask = 255 >> (8 - num_bits );
+    while( cur != packed_bytes_){
+      *cur >>= num_bits;
+      *cur |= (*(cur-1) & transfer_mask) << (8-num_bits);
+      --cur;
+    }
+    packed_bytes_[num_packed_bytes_-1] &= (255 << num_padding_bits_); //remove extra bits in last byte
+    *packed_bytes_ >>= num_bits;
+    *packed_bytes_ |= byte << (8-num_bits);
+  }
+  
+  void PackedSequence::push_bits_left(PackedSequence::PackedByte byte, int num_bits){
+    PackedByte *cur = packed_bytes_;
+    PackedByte *last = packed_bytes_ + (num_packed_bytes_ - 1);
+    PackedByte transfer_mask = 255 << ( 8 - num_bits );
+    
+    while( cur != last ){
+      *cur <<= num_bits;
+      *cur |= (*(cur+1) & transfer_mask) >> (8 - num_bits);
+      ++cur;
+    }
+
+    //special case where there an overhang into the last byte by less than 
+    //the number of bits added
+    int overhang = num_padding_bits_ == 0 ? 0 : (8 - num_padding_bits_);
+    if(overhang < num_bits && num_packed_bytes_ > 1){ 
+      *(last-1) |= (byte | ((255 >> (8 - (num_bits - overhang) )) << overhang)) >> overhang;
+    }
+    *last <<= num_bits;
+    *last |= byte << num_padding_bits_;
+  }
+
+
+  /*  void PackedSequence::push_bits_slow(PackedSequence::PackedByte byte, int num_bits){
     for( int i=num_packed_bytes_-1; i>=1; --i){
       packed_bytes_[i] >>= num_bits;
       packed_bytes_[i] |= (packed_bytes_[i-1] & (255 >> (8-num_bits))) << (8-num_bits);
@@ -31,7 +67,7 @@ namespace rollercoaster{
     packed_bytes_[num_packed_bytes_-1] &= (255 << num_padding_bits_); //remove extra bits in last byte
     packed_bytes_[0] >>= num_bits;
     packed_bytes_[0] |= (byte << (8-num_bits));
-  }
+    }*/
 
   PackedSequence::PackedByte PackedSequence::pop_bits(int num_bits){
     PackedSequence::PackedByte mask = 255 << (8-num_bits);
@@ -80,17 +116,6 @@ namespace rollercoaster{
 
 
   
-  int compare(const PackedSequence &lhs, const PackedSequence &rhs){
-    const PackedSequence::PackedByte *f = lhs.packed_bytes_ , *s = rhs.packed_bytes_, *e = lhs.packed_bytes_ + lhs.num_packed_bytes_ ;
-    while( f != e ){
-      if(*f < *s)
-	return -1;
-      if(*f++ > *s++)
-	return 1;
-    }
-    return 0;
-  }
-
 
   int write_to_stream(const PackedSequence &sequence, FILE *stream){
     return fwrite(sequence.packed_bytes(),sizeof(char), sequence.num_bytes(), stream) * sizeof(char);
