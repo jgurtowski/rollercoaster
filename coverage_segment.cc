@@ -14,7 +14,7 @@ namespace rollercoaster{
     int left = 0, i = 1;
     int64_t sum = counts[0];
     for(;i<static_cast<int>(counts.size());++i){
-      if(std::abs(counts[i-1] - counts[i]) > threshold){
+      if(std::abs(static_cast<float>(counts[i-1] - counts[i])) > threshold){
         cur.left = left;
         cur.right = i-1;
         cur.mean = sum / static_cast<double>(i-left);
