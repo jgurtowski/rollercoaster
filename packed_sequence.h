@@ -13,13 +13,13 @@ namespace rollercoaster{
 
   public:
     typedef unsigned char PackedByte;
-    
+
     /**
      *How many bits will be handeled by the sequence
      */
     PackedSequence(int required_bits);
 
-    
+
     /**
      *Clears the internal pack buffer
      */
@@ -27,19 +27,19 @@ namespace rollercoaster{
 
     /**
      *Pushes the first (lowest order (right->left)) num_bits onto the sequence
-     * if byte is 00000011 and num_bits = 3 
+     * if byte is 00000011 and num_bits = 3
      * the bits 011 will be pushed onto the left of the bit array
      */
     void push_bits_right(PackedByte byte, int num_bits);
     void push_bits_left(PackedByte byte, int num_bits);
-  
+
 
     /**
      *Pops bits from the underlying bit array
      *Bits are popped from the left most bit in the left most byte (array style)
      */
     PackedByte pop_bits(int num_bits);
-    
+
     /**
      *Retrieves the bits at position index without modifying
      *the underlying bit array.
@@ -69,13 +69,13 @@ namespace rollercoaster{
      *Static utility function for calculating the number of
      * bytes you need to hold a certain number of bits
      */
-    static inline int CalcBytesForBits(int bits){ return (bits / 8 + ((bits % 8) > 0 ? 1 : 0));} 
+    static inline int CalcBytesForBits(int bits){ return (bits / 8 + ((bits % 8) > 0 ? 1 : 0));}
 
     /**
      *Calculate the padding bits that are unused at the end of the bit array
      */
     static inline int CalcPaddingBits(int bits){ return (bits % 8 > 0 ? (8 - (bits % 8)):0);}
-    
+
 
     /**
      *Compare method for comparing two packed sequences
@@ -98,7 +98,7 @@ namespace rollercoaster{
      *Copy constructor
      */
     PackedSequence(const PackedSequence &other);
-    
+
     PackedByte *packed_bytes_;
 
 
@@ -108,7 +108,7 @@ namespace rollercoaster{
   /**
    *Free Functions
    */
-  
+
   /**
    *Compare two packed sequences by their raw bytes
    */
@@ -118,26 +118,26 @@ namespace rollercoaster{
    *Write bytes to stream
    *@return number of bytes written to stream
    */
-  
+
   int write_to_stream(const PackedSequence &sequence, FILE *out);
 
-// ============================================================================
-//                            INLINE DEFINITIONS
-// ============================================================================
+  // ============================================================================
+  //                            INLINE DEFINITIONS
+  // ============================================================================
 
-// FREE FUNCTIONS
-inline
-int compare(const PackedSequence &lhs, const PackedSequence &rhs)
-{
-    const PackedSequence::PackedByte *f = lhs.packed_bytes_ ,
-          *s = rhs.packed_bytes_,
-          *e = lhs.packed_bytes_ + lhs.num_packed_bytes_ ;
-    int result = 0;
-    while(!result && f != e ){
+  // FREE FUNCTIONS
+  inline
+    int compare(const PackedSequence &lhs, const PackedSequence &rhs)
+    {
+      const PackedSequence::PackedByte *f = lhs.packed_bytes_ ,
+        *s = rhs.packed_bytes_,
+        *e = lhs.packed_bytes_ + lhs.num_packed_bytes_ ;
+      int result = 0;
+      while(!result && f != e ){
         result = *f++ - *s++;
+      }
+      return result;
     }
-    return result;
-}
 
 
 }//namespace rollercoaster
