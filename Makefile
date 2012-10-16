@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-Wall -O3 #-pg
 
-BINARIES=kmerwrite kmerlookup readcorrector readcounts correctread
+BINARIES=kmerwrite kmerlookup hetcorrector readcounts correctread
 
 all: $(BINARIES)
 
@@ -17,9 +17,9 @@ kmerlookup: $(KMERLOOKUP_O)
 	$(CC) $(CFLAGS) $(KMERLOOKUP_O) -o kmerlookup
 
 
-READCORRECTOR_O = read_corrector.o fastq_record.o het_corrector.o abstract_kmer_lookup.o mmap_file.o mmap_kmer_lookup.o kmer_creator.o packed_kmer.o packed_sequence.o list_backed_kmer.o kmer_record.o coverage_segment.o
-readcorrector: $(READCORRECTOR_O)
-	$(CC) -lpthread $(CFLAGS) $(READCORRECTOR_O) -o readcorrector
+HETCORRECTOR_O = het_corrector_main.o fastq_record.o het_corrector.o abstract_kmer_lookup.o mmap_file.o mmap_kmer_lookup.o kmer_creator.o packed_kmer.o packed_sequence.o list_backed_kmer.o kmer_record.o coverage_segment.o
+hetcorrector: $(HETCORRECTOR_O)
+	$(CC) -lpthread $(CFLAGS) $(HETCORRECTOR_O) -o hetcorrector
 
 
 READCOUNTS_O = fastq_record.o abstract_kmer_lookup.o mmap_file.o mmap_kmer_lookup.o kmer_creator.o packed_kmer.o packed_sequence.o list_backed_kmer.o kmer_record.o coverage_segment.o read_counts.cc
