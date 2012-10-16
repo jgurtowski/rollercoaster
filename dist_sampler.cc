@@ -23,6 +23,7 @@ public:
     mmap_file_(file){}
 
   struct RangeCounts{
+    int b560;
     int g200;
     int b60100;
     int b100160;
@@ -31,10 +32,12 @@ public:
   void getRangeCounts(const std::vector<int> &counts, RangeCounts *range_counts){
     std::vector<int>::const_iterator b,e;
     e = counts.end();
-    range_counts->g200 = 0; range_counts->b60100 = 0; range_counts->b100160 = 0;
+    range_counts->g200 = 0; range_counts->b60100 = 0; range_counts->b100160 = 0; range_counts->b560 = 0;
     for(b = counts.begin(); b != e; ++b){
       if( *b > 200)
         ++range_counts->g200;
+      else if( *b <= 60 && *b >=5)
+	++range_counts->b560;
       else if( *b >= 60 && *b <=  100)
         ++range_counts->b60100;
       else if( *b >= 100 && *b <= 160)
@@ -42,39 +45,46 @@ public:
     }
   }
 
-  bool keep_pair(const std::vector<int> &counts_one, const std::vector<int> &counts_two ){
+  bool keep_pair(rollercoaster::MMapKmerLookup &lookup, const ReadPair &read_pair){
+    std::vector<int> counts_one, counts_two;
     RangeCounts counts, counts2;
+    __rand_mutex.lock();
+    int random = rand() % 100;
+    __rand_mutex.unlock();    
+    if(random >= 60)
+      return false;
+    
+    kmer_counts_for_read(read_pair.first.sequence(),lookup, &counts_one);
     getRangeCounts(counts_one, &counts);
-    if(counts.g200 > 1)
+    if(counts.g200 >= 55)
       return false;
+    
+    kmer_counts_for_read(read_pair.second.sequence(), lookup, &counts_two);
     getRangeCounts(counts_two, &counts2);
-    if( counts2.g200 > 1)
+    if( counts2.g200 >= 55)
       return false;
-    if( counts.b60100 > 40 && counts2.b60100 > 40){
-      std::cout << "hi";
-    }else if( counts.b100160 > 40 && counts2.b100160 > 40){
-      std::cout << "hi";
+    if( counts.b60100 > 40 && counts2.b60100 > 40 && random < 60){
+      return true;
+    }else if( counts.b100160 > 40 && counts2.b100160 > 40 && random < 50){
+      return true;
+    }else if( counts.b560 > 55 && counts2.b560 > 55){
+      return true;
     }
     return false;
   }
   
   virtual void run(){
-    std::vector<int> counts1, counts2;
     rollercoaster::MMapKmerLookup lookup(mmap_file_);
     ReadPair read_pair;
     
     while( queue_ -> pop( &read_pair ) ){
-      //kmer_counts_for_read(read_pair.first.sequence(),lookup, &counts1);
-      //kmer_counts_for_read(read_pair.second.sequence(), lookup, &counts2);
-      if(keep_pair(counts1,counts2)){
+      if(keep_pair(lookup, read_pair)){
         __io_mutex.lock();
-        std::cout << rand() % 100 << std::endl;
-        //std::cout << read_pair.first << std::endl;
-        //std::cout << read_pair.second << std::endl;
-        __io_mutex.unlock();
+	std::cout << read_pair.first << std::endl;
+        std::cout << read_pair.second << std::endl;
+	__io_mutex.unlock();
       }
     }
-
   }
 
 private:
@@ -82,11 +92,11 @@ private:
   rollercoaster::MMapFile &mmap_file_;
   static rollercoaster::PthreadMutex __io_mutex;
   static rollercoaster::PthreadMutex __rand_mutex;
-
 };
 
 
 rollercoaster::PthreadMutex DistSampler::__io_mutex;
+rollercoaster::PthreadMutex DistSampler::__rand_mutex;
 
 
 int main(int argc, char *argv[]){
