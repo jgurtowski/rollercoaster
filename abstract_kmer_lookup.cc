@@ -36,6 +36,7 @@ namespace rollercoaster{
   */
 
   void kmer_counts_for_read(const std::string &read, AbstractKmerLookup &lookup, std::vector<int> *out){
+
     out -> clear();
     std::string reverse;
     reverse.resize(read.size());
@@ -46,14 +47,28 @@ namespace rollercoaster{
 
     KmerCreator::const_packed_reverse_iterator fw_b = fw.packed_rbegin(), fw_e = fw.packed_rend();
     KmerCreator::const_packed_iterator rv_b = rv.packed_begin(), rv_e = rv.packed_end();
-    int diff;
+    //int diff;
+    int count;
     for(; fw_b != fw_e && rv_b != rv_e; ++fw_b, ++rv_b){
-	
-      diff = compare( *fw_b, *rv_b);
+
+      count = 0;
+      //lookup both forward and reverse kmer
+      if(lookup.has_record(*fw_b)){
+	count += lookup.last_record().count();
+      }
+      if(lookup.has_record(*rv_b)){
+	count += lookup.last_record().count();
+      }
+      out->push_back(count);
+      
+      ///lookup only the alphabetically lower kmer
+      /*diff = compare( *fw_b, *rv_b);
       if(diff < 0)
 	out->push_back(lookup.has_record(*fw_b) ? lookup.last_record().count(): -2 );
       else
-	out->push_back(lookup.has_record(*rv_b) ? lookup.last_record().count(): -2 );
+      out->push_back(lookup.has_record(*rv_b) ? lookup.last_record().count(): -2 );
+      */
+
     }
     std::reverse(out->begin(), out->end());
   }

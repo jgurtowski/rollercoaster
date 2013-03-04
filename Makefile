@@ -1,8 +1,8 @@
 CC=g++
-CFLAGS=-Wall -O3 #-pg
+CFLAGS=-Wall -O3 -ggdb #-pg
 
 
-BINARIES=kmerwrite kmerlookup hetcorrector readcounts correctread
+BINARIES=kmerwrite kmerlookup readcounts #hetcorrector correctread
 
 all: $(BINARIES)
 
